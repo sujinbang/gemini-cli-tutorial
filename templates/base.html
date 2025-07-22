@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Book App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        input[type="text"], input[type="password"], input[type="email"], textarea {
+            @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <nav class="bg-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                <a href="{% url 'home' %}" class="hover:text-blue-600 transition duration-300">My Book App</a>
+            </div>
+            <div class="space-x-4 flex items-center">
+                <a href="{% url 'book_list' %}" class="text-gray-600 hover:text-blue-600 transition duration-300">Books</a>
+                {% if user.is_authenticated %}
+                    <span class="text-gray-700">Hi, <span class="font-semibold">{{ user.username }}</span>!</span>
+                    <form action="{% url 'logout' %}" method="post" class="inline-block">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Login</a>
+                    <a href="{% url 'signup' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Signup</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-4 px-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message-{{ message.tags }} p-3 rounded-md mb-2 text-white shadow-md {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-yellow-500{% else %}bg-blue-500{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="flex-grow container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Modal Structure -->
+    <div id="modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" id="modal-title"></h3>
+            <p class="text-gray-700 mb-6" id="modal-body"></p>
+            <div class="flex justify-end space-x-4">
+                <button id="modal-cancel-btn" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition duration-300">Cancel</button>
+                <button id="modal-confirm-btn" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flash Messages
+            const messages = document.querySelectorAll('[class^="message-"]');
+            messages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.transition = 'opacity 0.5s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 500); // Wait for transition to finish before removing
+                }, 3000); // Message disappears after 3 seconds
+            });
+
+            // Modal Logic
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+            const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+            window.showModal = function(title, body, onConfirm) {
+                modalTitle.textContent = title;
+                modalBody.textContent = body;
+                modal.classList.remove('hidden');
+
+                modalConfirmBtn.onclick = function() {
+                    onConfirm();
+                    modal.classList.add('hidden');
+                };
+
+                modalCancelBtn.onclick = function() {
+                    modal.classList.add('hidden');
+                };
+
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            };
+        });
+    </script>
+</body>
+</html>

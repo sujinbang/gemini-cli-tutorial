@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg">
+    <h1 class="text-5xl font-extrabold mb-4 animate-pulse">Welcome to the Book App!</h1>
+    <p class="text-xl opacity-90">Discover, manage, and share your favorite books.</p>
+</div>
+
+<div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">Explore Books</h2>
+        <p class="text-gray-700 mb-4">Browse through a vast collection of books from various genres and authors.</p>
+        <a href="{% url 'book_list' %}" class="text-blue-600 hover:underline font-semibold">View All Books &rarr;</a>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">Manage Your Collection</h2>
+        <p class="text-gray-700 mb-4">Add, edit, and delete books to keep your personal library organized.</p>
+        <a href="{% url 'book_create' %}" class="text-blue-600 hover:underline font-semibold">Add a New Book &rarr;</a>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">Join Our Community</h2>
+        <p class="text-gray-700 mb-4">Sign up or log in to unlock more features and connect with other book lovers.</p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'signup' %}" class="text-blue-600 hover:underline font-semibold">Get Started &rarr;</a>
+        {% else %}
+            <span class="text-gray-600">You are logged in!</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
